@@ -1,0 +1,165 @@
+version: 2
+jobs:
+  info:
+    macos:
+      xcode: "9.1.0"
+
+    steps:
+      - run: xcodebuild -version
+      # - run: nvm --version
+      - run: node --version
+      - run: npm --version
+
+  unit_tests:
+    macos:
+      xcode: "9.1.0"
+    steps:
+      - checkout:
+          path: /Users/distiller/project
+      - run: git submodule update --init
+      - run:
+          name: Install
+          command: npm install
+      - run:
+          name: Unit Tests
+          command: npm run test
+  functional_tests_basic:
+    macos:
+      xcode: "9.1.0"
+    steps:
+      - checkout:
+          path: /Users/distiller/project
+      - run: git submodule update --init
+      - run:
+          name: Install
+          command: npm install
+      - run:
+          name: Install dependencies
+          command: brew install libimobiledevice --HEAD
+      - run:
+          name: Functional Tests - Basic
+          command: npm run mocha -- -t 480000 --recursive build/test/functional/basic -g @skip-ci -i
+          environmen:
+            CI_METRICS: 1
+            CI: 1
+            REAL_DEVICE: 0
+  functional_tests_driver:
+    macos:
+      xcode: "9.1.0"
+    steps:
+      - checkout:
+          path: /Users/distiller/project
+      - run: git submodule update --init
+      - run:
+          name: Install
+          command: npm install
+      - run:
+          name: Install dependencies
+          command: brew install libimobiledevice --HEAD
+      - run:
+          name: Functional Tests - Driver
+          command: npm run mocha -- -t 480000 --recursive build/test/functional/driver -g @skip-ci -i
+          environmen:
+            CI_METRICS: 1
+            CI: 1
+            REAL_DEVICE: 0
+  # functional_tests_long:
+  #   macos:
+  #     xcode: "9.1.0"
+  #   steps:
+  #     - checkout:
+  #         path: /Users/distiller/project
+  #     - run: git submodule update --init
+  #     - run:
+  #         name: Install
+  #         command: npm install
+  #     - run:
+  #         name: Functional Tests - Long
+  #         command: npm run mocha -- -t 480000 --recursive build/test/functional/long -g @skip-ci -i
+  #         environmen:
+  #           CI_METRICS: 1
+  #           CI: 1
+  #           REAL_DEVICE: 0
+  # functional_tests_parallel:
+  #   macos:
+  #     xcode: "9.1.0"
+  #   steps:
+  #     - checkout:
+  #         path: /Users/distiller/project
+  #     - run: git submodule update --init
+  #     - run:
+  #         name: Install
+  #         command: npm install
+  #     - run:
+  #         name: Functional Tests - Parallel
+  #         command: npm run mocha -- -t 480000 --recursive build/test/functional/parallel -g @skip-ci -i
+  #         environmen:
+  #           CI_METRICS: 1
+  #           CI: 1
+  #           REAL_DEVICE: 0
+  # functional_tests_web:
+  #   macos:
+  #     xcode: "9.1.0"
+  #   steps:
+  #     - checkout:
+  #         path: /Users/distiller/project
+  #     - run: git submodule update --init
+  #     - run:
+  #         name: Install
+  #         command: npm install
+  #     - run:
+  #         name: Functional Tests - Web
+  #         command: npm run mocha -- -t 480000 --recursive build/test/functional/web -g @skip-ci -i
+  #         environmen:
+  #           CI_METRICS: 1
+  #           CI: 1
+  #           REAL_DEVICE: 0
+  # functional_tests_8_3_smoke:
+  #   macos:
+  #     xcode: "8.3.3"
+  #   steps:
+  #     - checkout:
+  #         path: /Users/distiller/project
+  #     - run: git submodule update --init
+  #     - run: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
+  #     - run: nvm install 7
+  #     - run:
+  #         name: Install
+  #         command: npm install
+  #     - run:
+  #         name: Functional Tests - Xcode 8.3 Smoke Tests
+  #         command: npm run mocha -- -t 480000 --recursive build/test/functional/basic -g @skip-ci -i
+  #         environmen:
+  #           CI_METRICS: 1
+  #           CI: 1
+  #           REAL_DEVICE: 0
+  # functional_tests_7_3_smoke:
+  #   macos:
+  #     xcode: "7.3.1"
+  #   steps:
+  #     - checkout:
+  #         path: /Users/distiller/project
+  #     - run: git submodule update --init
+  #     - run:
+  #         name: Install
+  #         command: npm install
+  #     - run:
+  #         name: Functional Tests - Xcode 7.3 Smoke Tests
+  #         command: npm run mocha -- -t 480000 --recursive build/test/functional/basic -g @skip-ci -i
+  #         environmen:
+  #           CI_METRICS: 1
+  #           CI: 1
+  #           REAL_DEVICE: 0
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - info
+      - unit_tests
+      - functional_tests_basic
+      - functional_tests_driver
+      # - functional_tests_long
+      # - functional_tests_parallel
+      # - functional_tests_web
+      # - functional_tests_8_3_smoke
+      # - functional_tests_7_3_smoke
